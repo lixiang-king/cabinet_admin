@@ -26,9 +26,17 @@ const store = new Vuex.Store({
     // serviceData: {}
     XBattery: uni.getStorageSync('BATTERY'),
     XHexData: uni.getStorageSync('HEXDATA'),
-    XCntStatus: uni.getStorageSync('CNTSTATUS')
+    XCntStatus: uni.getStorageSync('CNTSTATUS'),
+    PickItemImg: '',
+    PickItemId: '',
   },
   mutations: {
+    setPickItemImg (state, provider) {
+      state.PickItemImg = provider
+    },
+    setPickItemId (state, provider) {
+      state.PickItemId = provider
+    },
     setOpenId (state, provider) {
       state.XOpenId = provider
       uni.setStorageSync('OPENID', provider)

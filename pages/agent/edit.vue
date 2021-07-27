@@ -19,13 +19,23 @@
           </pick-regions>
         </view>
       </view>
+      <view class="tab-box">
+        <view v-for="(item,index) in tabsList" :key="index" @click="toggleTabs(index)" class="item-tab" :class="{tabActive:index === activeIndex}">{{item}}</view>
+      </view>
       <view class="price_box">
-        <view class="box_title">
+        <view class="box_title" v-if="activeIndex === 0">
           <view class="p_title">价格填写</view>
           <view class="add_btn" @click="onAddPrice">添加价格+</view>
         </view>
+        <view class="box_title" v-else>
+          <view class="p_title">明细填写</view>
+          <view class="add_btn" @click="onAddPrice">添加明细+</view>
+        </view>
         <view class="price_edit">
           <view class="edit_item" v-for="(item, index) in price_info" :key="index">
+            <view class="product-img" v-if="activeIndex === 1">
+              <image @click="handleChangeImg(index)" class="img" :src="item.product_img" mode="widthFix"></image>
+            </view>
             <view class="item_info">
               <view class="label">售 价<text class="label_icon"></text></view>
               <input type="text" v-model="item.sale_price" />
@@ -52,8 +62,10 @@
     httpAgentUpdate,
     httpAgentInfo
   } from '@/utils/request/api/agent.js'
+  import { mapState } from 'vuex'
   export default {
     computed: {
+      ...mapState(['PickItemImg',  'PickItemId']),
       regionName() {
         // 转为字符串
         return this.region.join('')
@@ -61,6 +73,9 @@
     },
     data() {
       return {
+        jumpIndex: 0,
+        tabsList: ['按照价格', '按照产品'],
+        activeIndex: 0,
         isShowRegion: false,
         region: [],
         agentInfo: {
@@ -71,6 +86,7 @@
           area: null //区
         },
         price_info: [{
+          product_img: '../../static/img/public/circle.png',
           sale_price: 0,
           share_price: 0
         }],
@@ -78,8 +94,18 @@
       }
     },
     methods: {
+      handleChangeImg(index) {
+        this.jumpIndex = index
+        uni.navigateTo({
+            url:'/pages/project/edit?addProxy=1'
+        });
+      },
+      toggleTabs(index){
+        this.activeIndex = index;
+      },
       onAddPrice() {
         const obj = {
+          product_img: '../../static/img/public/circle.png',
           sale_price: 0,
           share_price: 0
         }
@@ -229,6 +255,11 @@
       if (id) {
         this.getAgentInfo()
       }
+    },
+    onShow(){
+      console.log('onshow')
+      console.log(this.PickItemImg)
+      this.PickItemImg && (this.price_info[this.jumpIndex].product_img = this.PickItemImg)
     }
   }
 </script>
@@ -292,6 +323,30 @@
         }
       }
 
+      .tab-box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 24px 0;
+        .item-tab {
+          font-size: 24rpx;
+          padding: 10rpx 20rpx;
+          color: #fff;
+          background-color: #ccc;
+        }
+        .tabActive {
+          background-color: #EF730F;
+        }
+        .item-tab:first-child {
+          border-top-left-radius: 6rpx;
+          border-bottom-left-radius: 6rpx;
+        }
+        .item-tab:last-child {
+          border-top-right-radius: 6rpx;
+          border-bottom-right-radius: 6rpx;
+        }
+      }
+
       .price_box {
         margin-top: 50rpx;
 
@@ -317,15 +372,23 @@
 
             display: flex;
             align-items: center;
-            padding: 0 24rpx;
+            // padding: 0 24rpx;
             border-bottom: 1rpx solid #b5b5b5;
+            .product-img {
+              width: 80rpx;
+              height: 80rpx;
+              .img {
+                width: 80rpx;
+                height: 80rpx;
+              }
+            }
 
             .item_info {
               display: flex;
-              margin-right: 30rpx;
+              margin: 0 15rpx;
 
               input {
-                width: 120rpx;
+                width: 100rpx;
               }
             }
 

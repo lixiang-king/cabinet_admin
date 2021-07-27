@@ -68,6 +68,7 @@
     httpProInfoById
   } from '@/utils/request/api/programme.js'
   import Goods from './Goods'
+  import { mapState, mapMutations } from 'vuex'
   export default {
     components: {
       Goods
@@ -76,6 +77,7 @@
       return {
         id: '',
         place_id: '',
+        addProxy: '',
         isGoodsShow: false,
         dataList: [],
         searchName: '',
@@ -92,6 +94,7 @@
       }
     },
     methods: {
+      ...mapMutations(['setPickItemImg', 'setPickItemId']),
       onGoodsPriceInp(e, item) {
         const val = e.target.value
         item.price = val
@@ -122,6 +125,14 @@
         // })
       },
       onGoodsOk(item) {
+        if(this.addProxy) {
+          this.setPickItemImg(item.small_img)
+          this.setPickItemId(item.goods_id)
+          uni.navigateBack({
+            delta: 1
+          })
+          return;
+        }
         uni.setNavigationBarTitle({
           title: '方案添加'
         })
@@ -240,6 +251,18 @@
     onLoad(option) {
       this.id = option.id
       this.place_id = option.placeId
+      this.addProxy = option.addProxy
+      if(this.addProxy) {
+        this.setPickItemImg('')
+        this.setPickItemId('')
+        this.getDataList()
+        this.isGoodsShow = true
+        // this.goodsIndex = index
+        uni.setNavigationBarTitle({
+          title: '选择商品'
+        })
+        return;
+      }
       if (this.id) { // 编辑
         uni.setNavigationBarTitle({
           title: '方案编辑'
