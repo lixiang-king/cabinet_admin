@@ -8,6 +8,50 @@ import {
   httpOpElectric
 } from '@/utils/request/api/operation.js'
 const BLEC = {
+  /**
+   * 蓝牙适配
+   */
+   openBluetoothAdapter() {
+    return new Promise((resolve, reject) => {
+      // 初始化蓝牙模块
+			uni.openBluetoothAdapter({
+			  success: (res) => {
+			    console.log('初始化蓝牙适配器成功')
+			    uni.hideLoading()
+			    resolve(res)
+			  },
+			  fail: (r) => {
+			    uni.hideLoading()
+			    reject(r)
+			  }
+			})
+    })
+  },
+  write(hex) {
+    const buffer = this.hexToArrayBuffer(hex)
+    return new Promise((resolve, reject) => {
+      uni.writeBLECharacteristicValue({
+        deviceId: store.state.connectedDeviceId,
+        serviceId: store.state.writeServicweId,
+        characteristicId: store.state.writeCharacteristicsId,
+        value: buffer,
+        success(res) {
+          console.log('写入成功')
+          resolve(res)
+        },
+        fail(r) {
+          reject(r)
+        }
+      })
+    })
+  },
+  hexToArrayBuffer(hex) {
+    return new Uint8Array(
+      hex.match(/[\da-f]{2}/gi).map((byte) => {
+        return parseInt(byte, 16)
+      })
+    ).buffer
+  },
 	//启动蓝牙 （初始化蓝牙模块-->获取本机蓝牙适配器状态-->开始搜寻附近的蓝牙外围设备-->监听寻找到新设备的事件）
   startBluetooth: function () {
     var that = this;
@@ -291,6 +335,30 @@ const BLEC = {
                     console.log("complete!");
                 }
             })
+
+            //电量服务
+          wx.getBLEDeviceCharacteristics({
+            deviceId: store.state.connectedDeviceId,
+            serviceId: Data.battery_serviceId,
+            success: (res) => {
+              let battery = res.characteristics.find((value) => {
+                return value.uuid.slice(4, 8) == '2A19'
+              })
+              Data.battery_characteristicId = battery.uuid
+              wx.notifyBLECharacteristicValueChange({
+                deviceId: store.state.connectedDeviceId,
+                serviceId: Data.battery_serviceId,
+                characteristicId: Data.battery_characteristicId,
+                state: true,
+                success: (res) => {
+                  console.log('notify_battery_success', res)
+                },
+                fail: (res) => {
+                  console.log('notify_battery_fail', res)
+                }
+              })
+            }
+          })
         }
     })
   },
@@ -303,13 +371,33 @@ const BLEC = {
     console.log(store.state.readCharacteristicsId);
     wx.notifyBLECharacteristicValueChange({
         state: true, // 启用监听 notify
-        // type:"notification",
         deviceId: store.state.connectedDeviceId,
         serviceId: store.state.readServicweId,
         characteristicId: store.state.readCharacteristicsId,
         success: function (res) {
             wx.showToast({title: '启用蓝牙监听'});
             console.log('启用蓝牙监听：', res);
+            wx.onBLECharacteristicValueChange(async (res) => {
+              console.log("onBLECharacter2132312======>");
+              console.log(res);
+              console.log(res.serviceId);
+              console.log(store.state.writeServicweId);
+              console.log(res.serviceId == store.state.writeServicweId);
+              // if (res.serviceId == store.state.writeServicweId) {
+                console.log('监听接收数据：', res);
+                console.log(that.bufToHex(res.value));
+                that.handleBattery(parseInt(that.bufToHex(res.value), 16))
+                /* let hexStr = that.ab2hex(res.value)
+                that.handleBattery(parseInt(hexStr, 16))
+                console.log('接收数据(十六进制)：', hexStr);
+                hexStr = that.hexCharCodeToStr(hexStr);
+                console.log('接收数据(十六进制转ASCII)：', hexStr);
+                wx.showToast({
+                  title: hexStr,
+                  icon:'none'
+                }) */
+              // }
+            })
             //通知远程服务器蓝牙就绪
             /*
             wx.request({
@@ -374,6 +462,9 @@ const BLEC = {
   },
   /* 出货设置 */
   navTo1(index) {
+    let hh = new Date().getHours() < 10 ? '0' + new Date().getHours() : new Date().getHours()
+      let mf = new Date().getMinutes() < 10 ? '0' + new Date().getMinutes() : new Date().getMinutes()
+      let ss = new Date().getSeconds() < 10 ? '0' + new Date().getSeconds() : new Date().getSeconds()
       var that = this
       // var order="9999999999999999999999";
       let buffer = new ArrayBuffer(17);
@@ -383,9 +474,9 @@ const BLEC = {
       dataView.setUint8(2, parseInt(1,10));
       dataView.setUint8(3, parseInt(1,10));
       dataView.setUint8(4, parseInt(index+1,10));
-    dataView.setUint8(5, parseInt(1,10));
-    dataView.setUint8(6, parseInt(2,10));
-    dataView.setUint8(7, parseInt(3,10));
+    dataView.setUint8(5, parseInt(hh,10));
+    dataView.setUint8(6, parseInt(mf,10));
+    dataView.setUint8(7, parseInt(ss,10));
     dataView.setUint8(8, parseInt(4,10));
     dataView.setUint8(9, parseInt(1,10));
     dataView.setUint8(10, parseInt(1,10));
@@ -404,6 +495,9 @@ const BLEC = {
 
   /* 灯光设置：中间灯设置 */
   navTo(index) {
+    let hh = new Date().getHours() < 10 ? '0' + new Date().getHours() : new Date().getHours()
+      let mf = new Date().getMinutes() < 10 ? '0' + new Date().getMinutes() : new Date().getMinutes()
+      let ss = new Date().getSeconds() < 10 ? '0' + new Date().getSeconds() : new Date().getSeconds()
       var that = this
       var order="9999999999999999999999";
       let buffer = new ArrayBuffer(16);
@@ -413,9 +507,9 @@ const BLEC = {
       dataView.setUint8(2, parseInt(2,10));//led设置：2
       dataView.setUint8(3, parseInt(1,10));//1 中间灯 ；2 仓位环灯；3 外圈跑马灯
       dataView.setUint8(4, parseInt(index,10));//LED 子命令：0 关 ；1 开 ；外圈跑马灯灯带控制指令
-    dataView.setUint8(5, parseInt(1,10));//校对时间：时
-    dataView.setUint8(6, parseInt(1,10));//校对时间：分
-    dataView.setUint8(7, parseInt(1,10));//校对时间：秒
+      dataView.setUint8(5, parseInt(hh,10));
+      dataView.setUint8(6, parseInt(mf,10));
+      dataView.setUint8(7, parseInt(ss,10));
     dataView.setUint8(8, parseInt(1,10));//开始时间：时
     dataView.setUint8(9, parseInt(1,10));//开始时间：分
     dataView.setUint8(10, parseInt(5,10));//开始时间：秒 17为11
@@ -434,6 +528,9 @@ const BLEC = {
 
   /* 灯光设置：跑马灯时间设置 */
   navTo2(index) {
+    let hh = new Date().getHours() < 10 ? '0' + new Date().getHours() : new Date().getHours()
+      let mf = new Date().getMinutes() < 10 ? '0' + new Date().getMinutes() : new Date().getMinutes()
+      let ss = new Date().getSeconds() < 10 ? '0' + new Date().getSeconds() : new Date().getSeconds()
       var that = this
       var order="9999999999999999999999";
       let buffer = new ArrayBuffer(16);
@@ -443,9 +540,9 @@ const BLEC = {
       dataView.setUint8(2, parseInt(2,10));//led设置：2
       dataView.setUint8(3, parseInt(3,10));//1 中间灯 ；2 仓位环灯；3 外圈跑马灯
       dataView.setUint8(4, parseInt(index,10));//LED 子命令：0 关 ；1 开 ；外圈跑马灯灯带控制指令
-    dataView.setUint8(5, parseInt(1,10));//校对时间：时
-    dataView.setUint8(6, parseInt(1,10));//校对时间：分
-    dataView.setUint8(7, parseInt(1,10));//校对时间：秒
+      dataView.setUint8(5, parseInt(hh,10));
+      dataView.setUint8(6, parseInt(mf,10));
+      dataView.setUint8(7, parseInt(ss,10));
     dataView.setUint8(8, parseInt(1,10));//开始时间：时
     dataView.setUint8(9, parseInt(1,10));//开始时间：分
     dataView.setUint8(10, parseInt(3,10));//开始时间：秒 21为15
@@ -463,6 +560,9 @@ const BLEC = {
   }, 
     /* 灯光设置：跑马灯调试 */
   navTo3(index) {
+      let hh = new Date().getHours() < 10 ? '0' + new Date().getHours() : new Date().getHours()
+      let mf = new Date().getMinutes() < 10 ? '0' + new Date().getMinutes() : new Date().getMinutes()
+      let ss = new Date().getSeconds() < 10 ? '0' + new Date().getSeconds() : new Date().getSeconds()
       var that = this
       var order="9999999999999999999999";
       let buffer = new ArrayBuffer(16);
@@ -472,9 +572,9 @@ const BLEC = {
       dataView.setUint8(2, parseInt(2,10));//led设置：2
       dataView.setUint8(3, parseInt(3,10));//1 中间灯 ；2 仓位环灯；3 外圈跑马灯
       dataView.setUint8(4, parseInt(index,10));//LED 子命令：0 关 ；1 开 ；外圈跑马灯灯带控制指令
-      dataView.setUint8(5, parseInt(0,10));//校对时间：时
-      dataView.setUint8(6, parseInt(0,10));//校对时间：分
-      dataView.setUint8(7, parseInt(0,10));//校对时间：秒
+      dataView.setUint8(5, parseInt(hh,10)); // 校验时间： 时
+      dataView.setUint8(6, parseInt(mf,10)); // 校验时间： 分
+      dataView.setUint8(7, parseInt(ss,10)); // 校验时间： 秒
       dataView.setUint8(8, parseInt(0,10));//开始时间：时
       dataView.setUint8(9, parseInt(0,10));//开始时间：分
       dataView.setUint8(10, parseInt(0,10));//开始时间：秒
@@ -489,6 +589,24 @@ const BLEC = {
       console.log(buffer);
       that.sendDataView(buffer);
   }, 
+
+  getNowTime () {
+    let dateTime
+    let hh = new Date().getHours()
+    let mf = new Date().getMinutes()
+    let ss = new Date().getSeconds()
+    dateTime = hh + ':' + mf + ':' + ss
+    return dateTime
+  },
+  handleTimeFormat(time) {
+    const timeArr = time.split(':')
+    let timeStr = ''
+    timeArr.forEach(item => {
+      let num = Number(item).toString(16).padStart(2, '0')
+      timeStr += num
+    })
+    return timeStr
+  },
 	
   //包数据校验
   USART_CheckProc(dataView){
@@ -508,8 +626,8 @@ const BLEC = {
   },
 
   sendDataView(buffer) {
-    var that = this
-    that.getMessagesData();
+    // var that = this
+    // that.getMessagesData();
     wx.writeBLECharacteristicValue({
         deviceId: store.state.connectedDeviceId,
         serviceId: store.state.writeServicweId,
@@ -529,7 +647,12 @@ const BLEC = {
       var that = this;
       // 这里的回调可以获取到 write 导致的特征值改变  
       wx.onBLECharacteristicValueChange(function (res) {
-        if (res.serviceId == Data.battery_serviceId) {
+        console.log("======getMessagesData=======");
+        console.log(res);
+        console.log(res.serviceId);
+        console.log(store.state.writeServicweId);
+        console.log(res.serviceId == store.state.writeServicweId);
+        if (res.serviceId == store.state.writeServicweId) {
           console.log('监听接收数据：', res);
           let hexStr = that.ab2hex(res.value)
           that.handleBattery(parseInt(hexStr, 16))
@@ -538,10 +661,9 @@ const BLEC = {
           console.log('接收数据(十六进制转ASCII)：', hexStr);
           // that.setData({getData: hexStr})
           wx.showToast({
-              title: hexStr,
-              icon:'none'
-            })
-          this.handleBattery(parseInt(this.bufToHex(res.value), 16))
+            title: hexStr,
+            icon:'none'
+          })
         }
           
       })
@@ -616,5 +738,24 @@ const BLEC = {
     }
     return resultStr.join("");
   },
+  handleRequest(url, data) {
+    const { XBLECUrl } = store.state
+    return new Promise((resolve, reject) => {
+      uni.request({
+        url: XBLECUrl + url,
+        header: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        method: 'POST',
+        data,
+        success: (res) => {
+          resolve(res.data)
+        },
+        fail: (r) => {
+          reject(r)
+        }
+      })
+    })
+  }
 }
 export default BLEC
