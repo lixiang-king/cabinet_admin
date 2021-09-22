@@ -1,3 +1,5 @@
+//待做 判断connectedDeviceId的入口
+
 import store from '@/store/store.js'
 var discovery = false
 var Data = {}
@@ -308,21 +310,6 @@ const BLEC = {
         success: function (res) {
             wx.showToast({title: '启用蓝牙监听'});
             console.log('启用蓝牙监听：', res);
-            wx.onBLECharacteristicValueChange(async (r) => {
-              console.log("onBLECharacteristicValueChange========>");
-              console.log(r);
-              if (r.serviceId == Data.battery_serviceId) {
-                that.handleBattery(parseInt(that.bufToHex(res.value), 16))
-              }
-              
-              /* if (res.serviceId == Data.battery_serviceId) {
-                this.handleBattery(parseInt(this.bufToHex(res.value), 16))
-              } else if (res.serviceId == Data.serviceId) {
-                let data = this.bufToHex(res.value)
-                //返回值
-                this.getFeedBack(data)
-              } */
-            })
             //通知远程服务器蓝牙就绪
             /*
             wx.request({
@@ -542,9 +529,10 @@ const BLEC = {
       var that = this;
       // 这里的回调可以获取到 write 导致的特征值改变  
       wx.onBLECharacteristicValueChange(function (res) {
+        if (res.serviceId == Data.battery_serviceId) {
           console.log('监听接收数据：', res);
           let hexStr = that.ab2hex(res.value)
-          that.handleBattery(parseInt(hexStr, 10))
+          that.handleBattery(parseInt(hexStr, 16))
           console.log('接收数据(十六进制)：', hexStr);
           hexStr = that.hexCharCodeToStr(hexStr);
           console.log('接收数据(十六进制转ASCII)：', hexStr);
@@ -553,6 +541,9 @@ const BLEC = {
               title: hexStr,
               icon:'none'
             })
+          this.handleBattery(parseInt(this.bufToHex(res.value), 16))
+        }
+          
       })
   },
 
