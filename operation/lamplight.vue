@@ -40,7 +40,7 @@
             </view>
           </view>
           <text>请先校准时间，再点击对应选项卡选择灯光关闭时间</text>
-          <view class="deviceBinding" @click="onConfirm">确认设置</view>
+          <view class="deviceBinding" @click="onConfirm1">确认设置</view>
         </view>
       </view>
 	  
@@ -51,17 +51,17 @@
 	    <view class="lamplight_settings">
 	      <view class="date_picker_page">
 	        <view class="value">
-	          <picker mode="time" :value="start" @change="onStartChange">
-	            <view class="start_date">{{ start ? start : '开始时间' }}</view>
+	          <picker mode="time" :value="runStart" @change="onRunStartChange">
+	            <view class="start_date">{{ runStart ? runStart : '开始时间' }}</view>
 	          </picker>
 	          <text>—</text>
-	          <picker mode="time" :value="end" @change="onEndChange">
-	            <view class="end_date">{{ end ? end : '结束时间' }}</view>
+	          <picker mode="time" :value="runEnd" @change="onRunEndChange">
+	            <view class="end_date">{{ runEnd ? runEnd : '结束时间' }}</view>
 	          </picker>
 	        </view>
 	      </view>
 	      <text>请先校准时间，再点击对应选项卡选择灯光关闭时间</text>
-	      <view class="deviceBinding" @click="onConfirm">确认设置</view>
+	      <view class="deviceBinding" @click="onConfirm2">确认设置</view>
 	    </view>
 	  </view>
 	  
@@ -81,7 +81,9 @@
     data() {
       return {
         start: '',
-        end: ''
+        end: '',
+        runStart: '',
+        runEnd: ''
       }
     },
     onUnload() {
@@ -91,26 +93,55 @@
       BLEC.openBluetoothAdapter()
     },
     methods: {
-      ...mapMutations(['setDeviceCode']),
+      ...mapMutations(['setDeviceCode', 'setDeviceName']),
       onStartChange(e) {
         this.start = e.target.value
       },
       onEndChange(e) {
         this.end = e.target.value
       },
+      onRunStartChange(e) {
+        this.runStart = e.target.value
+      },
+      onRunEndChange(e) {
+        this.runEnd = e.target.value
+      },
       scanToShow() {
-        uni.scanCode({
-          success: res => {
+        var that = this
+        wx.scanCode({
+          success: res =>  {
             const { result } = res
             const arr = result.split('/')
             this.setDeviceCode(arr[arr.length - 1])
-            // https://me.dc-box.com/scode/A20081001022
-            BLEC.found()
+            that.setDeviceName(res.result)
+            BLEC.startBluetooth();
           }
         })
       },
-      onConfirm() {
+      onConfirm1() {
         if (!this.start) return uni.showToast({
+          title: '请选择开始时间',
+          icon: 'none'
+        })
+        if (!this.end) return uni.showToast({
+          title: '请选择结束时间',
+          icon: 'none'
+        })
+        BLEC.navTo(1, BLEC.handleTimeFormat(this.start), BLEC.handleTimeFormat(this.end))
+      },
+      onConfirm2() {
+        if (!this.runStart) return uni.showToast({
+          title: '请选择开始时间',
+          icon: 'none'
+        })
+        if (!this.runEnd) return uni.showToast({
+          title: '请选择结束时间',
+          icon: 'none'
+        })
+        BLEC.navTo2(170, BLEC.handleTimeFormat(this.runStart), BLEC.handleTimeFormat(this.runEnd))
+      },
+      onConfirm() {
+        /* if (!this.start) return uni.showToast({
           title: '请选择开始时间',
           icon: 'none'
         })
@@ -145,7 +176,7 @@
               icon: 'none'
             })
           }
-        })
+        }) */
       }
     }
   }
