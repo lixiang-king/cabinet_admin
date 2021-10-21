@@ -188,8 +188,8 @@ const BLEC = {
           store.commit('setStatus', "已连接")
           that.getServices();
           setTimeout(function () {
-          that.notifyMachineid();
-          }, 3000)
+            that.notifyMachineid();
+          }, 1000)
         },
 		
         fail: function () {
@@ -206,45 +206,36 @@ const BLEC = {
   //验证设备id
   notifyMachineid: function () {
     var that = this;
-    let buffer = new ArrayBuffer(17);
+    let buffer = new ArrayBuffer(18);
     let dataView = new DataView(buffer);
+    const {
+      XDeviceCode
+    } = store.state
+    let splitCode = XDeviceCode.split('');
     dataView.setUint8(0, parseInt(208,10));
     dataView.setUint8(1, parseInt(17,10));
     dataView.setUint8(2, parseInt(3,10));
-    // dataView.setUint8(3,'2');
-    // dataView.setUint8(4,'A');
-    // dataView.setUint8(5,'E');
-    // dataView.setUint8(6,'4');
-    // dataView.setUint8(7,'E');
-    // dataView.setUint8(8,'7');
-    // dataView.setUint8(9,'8');
-    // dataView.setUint8(10,'1');
-    // dataView.setUint8(11,'8');
-    // dataView.setUint8(12,'C');
-    // dataView.setUint8(13,'8');
-    // dataView.setUint8(14,'3');
 
-    dataView.setUint8(3,parseInt(2,10));
-    dataView.setUint8(4,parseInt(10,10));
-    dataView.setUint8(5,parseInt(14,10));
-    dataView.setUint8(6,parseInt(4,10));
-    dataView.setUint8(7,parseInt(14,10));
-    dataView.setUint8(8,parseInt(7,10));
-    dataView.setUint8(9,parseInt(8,10));
-    dataView.setUint8(10,parseInt(1,10));
-    dataView.setUint8(11,parseInt(8,10));
-    dataView.setUint8(12,parseInt(12,10));
-    dataView.setUint8(13,parseInt(8,10));
-    dataView.setUint8(14,parseInt(3,10));
-    
-    dataView.setUint8(15,parseInt(0,10));
+    dataView.setUint8(3,splitCode[0]);
+    dataView.setUint8(4,parseInt(splitCode[1],10));
+    dataView.setUint8(5,parseInt(splitCode[2],10));
+    dataView.setUint8(6,parseInt(splitCode[3],10));
+    dataView.setUint8(7,parseInt(splitCode[4],10));
+    dataView.setUint8(8,parseInt(splitCode[5],10));
+    dataView.setUint8(9,parseInt(splitCode[6],10));
+    dataView.setUint8(10,parseInt(splitCode[7],10));
+    dataView.setUint8(11,parseInt(splitCode[8],10));
+    dataView.setUint8(12,parseInt(splitCode[9],10));
+    dataView.setUint8(13,parseInt(splitCode[10],10));
+    dataView.setUint8(14,parseInt(splitCode[11],10));
+    dataView.setUint8(15,parseInt(splitCode[12],10));
+    dataView.setUint8(16,parseInt(0,10));
     var sum = this.USART_CheckProc(new Uint8Array(buffer));
     // console.log(123456);
     //校验位
-    dataView.setUint8(16, parseInt(sum,16));
-    // console.log(buffer);
+    dataView.setUint8(17, parseInt(sum,16));
+    console.log("检验位===》》",buffer);
     that.sendDataView(buffer);
-    
   },
 
 
@@ -367,38 +358,24 @@ const BLEC = {
         serviceId: store.state.readServicweId,
         characteristicId: store.state.readCharacteristicsId,
         success: function (res) {
-            wx.showToast({title: '启用蓝牙监听'});
-            console.log('启用蓝牙监听：', res);
-            wx.onBLECharacteristicValueChange(async (res) => {
-              console.log("onBLECharacter2132312======>");
-              console.log(res);
-              console.log(res.serviceId == store.state.writeServicweId);
-              if (res.serviceId == store.state.writeServicweId) {
-                console.log('监听接收数据：', res);
-                console.log(that.bufToHex(res.value));
-                that.handleBattery(parseInt(that.bufToHex(res.value), 16))
-                /* let hexStr = that.ab2hex(res.value)
-                that.handleBattery(parseInt(hexStr, 16))
-                console.log('接收数据(十六进制)：', hexStr);
-                hexStr = that.hexCharCodeToStr(hexStr);
-                console.log('接收数据(十六进制转ASCII)：', hexStr);
-                wx.showToast({
-                  title: hexStr,
-                  icon:'none'
-                }) */
-              }
-            })
-            //通知远程服务器蓝牙就绪
-            /*
-            wx.request({
-                url: 'http://www.xxxx.com/test1.php', //仅为示例，并非真实的接口地址
-                data: {x: '',y: ''},
-                header: {'content-type': 'application/json' // 默认值},
-                success (res) {
-                  console.log(res.data)
-                }
-            })
-            */
+          wx.showToast({title: '启用蓝牙监听'});
+          console.log('启用蓝牙监听：', res);
+          wx.onBLECharacteristicValueChange(async (res) => {
+            console.log("onBLECharacter2132312======>");
+            if (res.serviceId == store.state.writeServicweId) {
+              console.log('监听接收数据：', res);
+              let bufToHexVal = that.bufToHex(res.value).toString();
+              console.log(bufToHexVal);
+              console.log(bufToHexVal.slice(10,12));
+              console.log("转换后的电量值是====》", parseInt(bufToHexVal.slice(10,12), 16));
+              that.handleBattery(parseInt(bufToHexVal.slice(10,12), 16))
+            }
+          })
+          //获取电量
+          setTimeout(() => {
+            console.log("获取电量===========》》》》");
+            that.navToLight(1);
+          }, 1000)
             store.commit('setCntStatus', '连接成功')
         },
         fail: function (res) {
@@ -416,6 +393,33 @@ const BLEC = {
         }
     })
   },
+
+  /* 灯光设置：获取电量 */
+  navToLight(index) {
+    var that = this
+    var order="9999999999999999999999";
+    let buffer = new ArrayBuffer(16);
+    let dataView = new DataView(buffer);
+    dataView.setUint8(0, parseInt(208,10));
+    dataView.setUint8(1, parseInt(16,10));
+    dataView.setUint8(2, parseInt(2,10));//led设置：2
+    dataView.setUint8(3, parseInt(1,10));//1 中间灯 ；2 仓位环灯；3 外圈跑马灯
+    dataView.setUint8(4, parseInt(index,10));//LED 子命令：0 关 ；1 开 ；外圈跑马灯灯带控制指令
+    dataView.setUint8(5, parseInt(0,16)); // 校验时间： 时
+    dataView.setUint8(6, parseInt(0,16)); // 校验时间： 分
+    dataView.setUint8(7, parseInt(0,16)); // 校验时间： 秒
+    dataView.setUint8(8, parseInt(0,16));//开始时间：时
+    dataView.setUint8(9, parseInt(0,16));//开始时间：分
+    dataView.setUint8(10, parseInt(0,16));//开始时间：秒 17为11
+    dataView.setUint8(11, parseInt(0,16));//结束时间:时
+    dataView.setUint8(12, parseInt(0,16));//结束时间:分
+    dataView.setUint8(13, parseInt(0,16));//结束时间:秒 48为30
+    dataView.setUint8(14, parseInt(0,10));//备用
+    var sum = this.USART_CheckProc(new Uint8Array(buffer));
+    //校验位
+    dataView.setUint8(15, parseInt(sum,16));
+    that.sendDataView(buffer);
+  }, 
 
   //断开连接  
   closeBluetooth: function () {
@@ -464,9 +468,9 @@ const BLEC = {
       dataView.setUint8(2, parseInt(1,10));
       dataView.setUint8(3, parseInt(1,10));
       dataView.setUint8(4, parseInt(index+1,10));
-    dataView.setUint8(5, parseInt(hh,16));
-    dataView.setUint8(6, parseInt(mf,16));
-    dataView.setUint8(7, parseInt(ss,16));
+    dataView.setUint8(5, parseInt(hh,10));
+    dataView.setUint8(6, parseInt(mf,10));
+    dataView.setUint8(7, parseInt(ss,10));
     dataView.setUint8(8, parseInt(4,10));
     dataView.setUint8(9, parseInt(1,10));
     dataView.setUint8(10, parseInt(1,10));
@@ -497,15 +501,15 @@ const BLEC = {
     dataView.setUint8(2, parseInt(2,10));//led设置：2
     dataView.setUint8(3, parseInt(1,10));//1 中间灯 ；2 仓位环灯；3 外圈跑马灯
     dataView.setUint8(4, parseInt(index,10));//LED 子命令：0 关 ；1 开 ；外圈跑马灯灯带控制指令
-    dataView.setUint8(5, parseInt(hh,16)); // 校验时间： 时
-    dataView.setUint8(6, parseInt(mf,16)); // 校验时间： 分
-    dataView.setUint8(7, parseInt(ss,16)); // 校验时间： 秒
-    dataView.setUint8(8, parseInt(start[0] ? start[0] : 0,16));//开始时间：时
-    dataView.setUint8(9, parseInt(start[1] ? start[1] : 0,16));//开始时间：分
-    dataView.setUint8(10, parseInt(0,16));//开始时间：秒 17为11
-    dataView.setUint8(11, parseInt(end[0] ? end[0] : 0,16));//结束时间:时
-    dataView.setUint8(12, parseInt(end[1] ? end[1] : 0,16));//结束时间:分
-    dataView.setUint8(13, parseInt(0,16));//结束时间:秒 48为30
+    dataView.setUint8(5, parseInt(hh,10)); // 校验时间： 时
+    dataView.setUint8(6, parseInt(mf,10)); // 校验时间： 分
+    dataView.setUint8(7, parseInt(ss,10)); // 校验时间： 秒
+    dataView.setUint8(8, parseInt(start[0] ? start[0] : 0,10));//开始时间：时
+    dataView.setUint8(9, parseInt(start[1] ? start[1] : 0,10));//开始时间：分
+    dataView.setUint8(10, parseInt(0,10));//开始时间：秒 17为11
+    dataView.setUint8(11, parseInt(end[0] ? end[0] : 0,10));//结束时间:时
+    dataView.setUint8(12, parseInt(end[1] ? end[1] : 0,10));//结束时间:分
+    dataView.setUint8(13, parseInt(0,10));//结束时间:秒 48为30
     dataView.setUint8(14, parseInt(0,10));//备用
     var sum = this.USART_CheckProc(new Uint8Array(buffer));
     console.log(sum);
@@ -529,15 +533,15 @@ const BLEC = {
       dataView.setUint8(2, parseInt(2,10));//led设置：2
       dataView.setUint8(3, parseInt(3,10));//1 中间灯 ；2 仓位环灯；3 外圈跑马灯
       dataView.setUint8(4, parseInt(index,10));//LED 子命令：0 关 ；1 开 ；外圈跑马灯灯带控制指令
-      dataView.setUint8(5, parseInt(hh,16));
-      dataView.setUint8(6, parseInt(mf,16));
-      dataView.setUint8(7, parseInt(ss,16));
-      dataView.setUint8(8, parseInt(start[0] ? start[0] : 0,16));//开始时间：时
-      dataView.setUint8(9, parseInt(start[1] ? start[1] : 0,16));//开始时间：分
+      dataView.setUint8(5, parseInt(hh,10));
+      dataView.setUint8(6, parseInt(mf,10));
+      dataView.setUint8(7, parseInt(ss,10));
+      dataView.setUint8(8, parseInt(start[0] ? start[0] : 0,10));//开始时间：时
+      dataView.setUint8(9, parseInt(start[1] ? start[1] : 0,10));//开始时间：分
       dataView.setUint8(10, parseInt(0,16));//开始时间：秒 17为11
-      dataView.setUint8(11, parseInt(end[0] ? end[0] : 0,16));//结束时间:时
-      dataView.setUint8(12, parseInt(end[1] ? end[1] : 0,16));//结束时间:分
-      dataView.setUint8(13, parseInt(0,16));//结束时间:秒 48为30
+      dataView.setUint8(11, parseInt(end[0] ? end[0] : 0,10));//结束时间:时
+      dataView.setUint8(12, parseInt(end[1] ? end[1] : 0,10));//结束时间:分
+      dataView.setUint8(13, parseInt(0,10));//结束时间:秒 48为30
       dataView.setUint8(14, parseInt(0,10));//备用
         
       var sum = this.USART_CheckProc(new Uint8Array(buffer));
@@ -561,9 +565,9 @@ const BLEC = {
       dataView.setUint8(2, parseInt(2,10));//led设置：2
       dataView.setUint8(3, parseInt(3,10));//1 中间灯 ；2 仓位环灯；3 外圈跑马灯
       dataView.setUint8(4, parseInt(index,10));//LED 子命令：0 关 ；1 开 ；外圈跑马灯灯带控制指令
-      dataView.setUint8(5, parseInt(hh,16)); // 校验时间： 时
-      dataView.setUint8(6, parseInt(mf,16)); // 校验时间： 分
-      dataView.setUint8(7, parseInt(ss,16)); // 校验时间： 秒
+      dataView.setUint8(5, parseInt(hh,10)); // 校验时间： 时
+      dataView.setUint8(6, parseInt(mf,10)); // 校验时间： 分
+      dataView.setUint8(7, parseInt(ss,10)); // 校验时间： 秒
       dataView.setUint8(8, parseInt(0,10));//开始时间：时
       dataView.setUint8(9, parseInt(0,10));//开始时间：分
       dataView.setUint8(10, parseInt(0,10));//开始时间：秒
