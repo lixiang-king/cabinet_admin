@@ -38,11 +38,10 @@
       }
     },
     methods: {
-      ...mapMutations(['setDeviceCode']),
+      ...mapMutations(['setDeviceCode', 'setDeviceName']),
       onStockOut (item) {
         const index = Number(item.hid) - 1
-        BLEC.write(this.XHexData.fillHex[index])
-        .then(res => {
+        BLEC.navTo1(index).then(res => {
           uni.showToast({
             title: '出仓成功'
           })
@@ -53,6 +52,18 @@
             icon: 'none'
           })
         })
+        /* BLEC.write(this.XHexData.fillHex[index])
+        .then(res => {
+          uni.showToast({
+            title: '出仓成功'
+          })
+        })
+        .catch(r => {
+          uni.showToast({
+            title: '出仓失败',
+            icon: 'none'
+          })
+        }) */
       },
       onConfirm(item) {
         const params = {
@@ -84,13 +95,15 @@
       }
     },
     async onLoad(option) {
-      await BLEC.openBluetoothAdapter()
+      // await BLEC.openBluetoothAdapter()
       this.machine_id = option.machineId
       this.setDeviceCode(option.deviceCode)
       console.log("=======onload===");
+      console.log(option.deviceCode);
+      this.setDeviceName(option.deviceCode)
       await this.getDataList()
-      await BLEC.found()
-      
+      // await BLEC.found()
+      await BLEC.startBluetooth();
     },
     onUnload() {
       BLEC.closeBle()

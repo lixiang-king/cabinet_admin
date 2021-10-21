@@ -82,11 +82,15 @@
               result
             } = res
             // https://me.dc-box.com/scode/A20081001022
-            const deviceNum = result.slice(result.length - 12, result.length)
+            /* const deviceNum = result.slice(result.length - 12, result.length)
             // this.deviceCode = deviceNum
             uni.navigateTo({
               // url: '/operation/supplyAddOp?deviceCode=' + deviceNum + '&machineId=' + this.id
               url: '/operation/supplyAddOp?deviceCode=' + deviceNum + '&machineId=' + '2019102252000036'
+            }) */
+            uni.navigateTo({
+              // url: '/operation/supplyAddOp?deviceCode=' + deviceNum + '&machineId=' + this.id
+              url: '/operation/supplyAddOp?deviceCode=' + result
             })
           }
         })

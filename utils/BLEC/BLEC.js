@@ -76,12 +76,13 @@ const BLEC = {
                     that.onBluetoothDeviceFound()
                 } else {
                     //开始搜寻附近的蓝牙外围设备
-                    wx.startBluetoothDevicesDiscovery({
+                    uni.startBluetoothDevicesDiscovery({
                         allowDuplicatesKey: true, //允许重复上报同一设备,更新RSSI值
                         success(res) {
                             that.onBluetoothDeviceFound()
                         },
                         fail(res) {
+                          console.log(res);
                            /*  that.setData({
                                 status: '搜寻失败：'+res.errCode
                             }) */
@@ -457,17 +458,17 @@ const BLEC = {
   /* 出货设置 */
   navTo1(index) {
     let hh = new Date().getHours() < 10 ? '0' + new Date().getHours() : new Date().getHours()
-      let mf = new Date().getMinutes() < 10 ? '0' + new Date().getMinutes() : new Date().getMinutes()
-      let ss = new Date().getSeconds() < 10 ? '0' + new Date().getSeconds() : new Date().getSeconds()
-      var that = this
-      // var order="9999999999999999999999";
-      let buffer = new ArrayBuffer(17);
-      let dataView = new DataView(buffer);
-      dataView.setUint8(0, parseInt(208,10));
-      dataView.setUint8(1, parseInt(17,10));
-      dataView.setUint8(2, parseInt(1,10));
-      dataView.setUint8(3, parseInt(1,10));
-      dataView.setUint8(4, parseInt(index+1,10));
+    let mf = new Date().getMinutes() < 10 ? '0' + new Date().getMinutes() : new Date().getMinutes()
+    let ss = new Date().getSeconds() < 10 ? '0' + new Date().getSeconds() : new Date().getSeconds()
+    var that = this
+    // var order="9999999999999999999999";
+    let buffer = new ArrayBuffer(17);
+    let dataView = new DataView(buffer);
+    dataView.setUint8(0, parseInt(208,10));
+    dataView.setUint8(1, parseInt(17,10));
+    dataView.setUint8(2, parseInt(1,10));
+    dataView.setUint8(3, parseInt(1,10));
+    dataView.setUint8(4, parseInt(index+1,10));
     dataView.setUint8(5, parseInt(hh,10));
     dataView.setUint8(6, parseInt(mf,10));
     dataView.setUint8(7, parseInt(ss,10));
@@ -479,12 +480,14 @@ const BLEC = {
     dataView.setUint8(13, parseInt(1,10));
     dataView.setUint8(14, parseInt(1,10));
     dataView.setUint8(15, parseInt(0,10));
-      var sum = this.USART_CheckProc(new Uint8Array(buffer));
-      // console.log(sum);
-      //校验位
-      dataView.setUint8(16, parseInt(sum,16));
-      // console.log(buffer);
-      that.sendDataView(buffer);
+    var sum = this.USART_CheckProc(new Uint8Array(buffer));
+    // console.log(sum);
+    //校验位
+    dataView.setUint8(16, parseInt(sum,16));
+    // console.log(buffer);
+    return new Promise((resolve, reject) => {
+      that.sendDataView(buffer).then(res => resolve(res)).catch(err => reject(err))
+    })
   }, 
 
   /* 灯光设置：中间灯设置 */
@@ -516,7 +519,9 @@ const BLEC = {
     //校验位
     dataView.setUint8(15, parseInt(sum,16));
     console.log(buffer);
-    that.sendDataView(buffer);
+    return new Promise((resolve, reject) => {
+      that.sendDataView(buffer).then(res => resolve(res)).catch(err => reject(err))
+    })
   }, 
 
   /* 灯光设置：跑马灯时间设置 */
@@ -545,11 +550,14 @@ const BLEC = {
       dataView.setUint8(14, parseInt(0,10));//备用
         
       var sum = this.USART_CheckProc(new Uint8Array(buffer));
-        console.log(sum);
-        //校验位
-        dataView.setUint8(15, parseInt(sum,16));
-        console.log(buffer);
-        that.sendDataView(buffer);
+      console.log(sum);
+      //校验位
+      dataView.setUint8(15, parseInt(sum,16));
+      console.log(buffer);
+      
+      return new Promise((resolve, reject) => {
+        that.sendDataView(buffer).then(res => resolve(res)).catch(err => reject(err))
+      })
   }, 
     /* 灯光设置：跑马灯调试 */
   navTo3(index) {
@@ -580,7 +588,9 @@ const BLEC = {
       //校验位
       dataView.setUint8(15, parseInt(sum,16));
       console.log(buffer);
-      that.sendDataView(buffer);
+      return new Promise((resolve, reject) => {
+        that.sendDataView(buffer).then(res => resolve(res)).catch(err => reject(err))
+      })
   }, 
 
   getNowTime () {
@@ -622,7 +632,8 @@ const BLEC = {
   sendDataView(buffer) {
     // var that = this
     // that.getMessagesData();
-    wx.writeBLECharacteristicValue({
+    return new Promise((resolve, reject) => {
+      wx.writeBLECharacteristicValue({
         deviceId: store.state.connectedDeviceId,
         serviceId: store.state.writeServicweId,
         characteristicId: store.state.writeCharacteristicsId,
@@ -632,7 +643,13 @@ const BLEC = {
             console.log('写服务uuid:', store.state.writeServicweId)
             console.log('写通道uuid:', store.state.writeCharacteristicsId)
             console.log('发送成功：', res)
+            resolve(res)
+        },
+        fail: err => {
+          console.log(err);
+          reject(err)
         }
+      })
     })
   },
   
@@ -750,6 +767,23 @@ const BLEC = {
         }
       })
     })
-  }
+  },
+  /**
+   * 断开连接
+   */
+   closeBle() {
+    // 关闭蓝牙
+    uni.closeBluetoothAdapter({
+      success(res) {
+        console.log(res)
+      }
+    })
+    // 清空store数据
+    store.commit('setDeviceCode', '')
+    store.commit('setDeviceId', '')
+    store.commit('setDevInfo', {})
+    store.commit('setBattery', 0)
+    store.commit('setCntStatus', '未连接')
+  },
 }
 export default BLEC

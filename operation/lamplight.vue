@@ -127,7 +127,17 @@
           title: '请选择结束时间',
           icon: 'none'
         })
-        BLEC.navTo(1, BLEC.handleTimeFormat(this.start), BLEC.handleTimeFormat(this.end))
+        BLEC.navTo(1, BLEC.handleTimeFormat(this.start), BLEC.handleTimeFormat(this.end)).then(() => {
+          uni.showToast({
+            title: '设置成功'
+          })
+        })
+        .catch(() => {
+          uni.showToast({
+            title: '设置失败',
+            icon: 'none'
+          })
+        })
       },
       onConfirm2() {
         if (!this.runStart) return uni.showToast({
@@ -138,7 +148,17 @@
           title: '请选择结束时间',
           icon: 'none'
         })
-        BLEC.navTo2(170, BLEC.handleTimeFormat(this.runStart), BLEC.handleTimeFormat(this.runEnd))
+        BLEC.navTo2(170, BLEC.handleTimeFormat(this.runStart), BLEC.handleTimeFormat(this.runEnd)).then(() => {
+          uni.showToast({
+            title: '设置成功'
+          })
+        })
+        .catch(() => {
+          uni.showToast({
+            title: '设置失败',
+            icon: 'none'
+          })
+        })
       },
       onConfirm() {
         /* if (!this.start) return uni.showToast({
