@@ -81,6 +81,11 @@
             const {
               result
             } = res
+            console.log("捕获详情扫码结果======>>>>");
+            console.log(res);
+            const arr = result.split('/')
+            let deviceCode = arr[arr.length - 1] || ''
+            console.log("deviceCode====", deviceCode);
             // https://me.dc-box.com/scode/A20081001022
             /* const deviceNum = result.slice(result.length - 12, result.length)
             // this.deviceCode = deviceNum
@@ -90,7 +95,7 @@
             }) */
             uni.navigateTo({
               // url: '/operation/supplyAddOp?deviceCode=' + deviceNum + '&machineId=' + this.id
-              url: '/operation/supplyAddOp?deviceCode=' + result
+              url: '/operation/supplyAddOp?deviceCode=' + deviceCode
             })
           }
         })

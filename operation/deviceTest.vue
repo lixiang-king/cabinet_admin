@@ -145,7 +145,7 @@
             console.log(res);
             const arr = result.split('/')
             this.setDeviceCode(arr[arr.length - 1])
-            that.setDeviceName(res.result)
+            that.setDeviceName(arr[arr.length - 1])
             BLEC.startBluetooth();
           }
         })
