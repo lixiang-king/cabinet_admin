@@ -681,8 +681,8 @@ const BLEC = {
   },
 
   handleBattery (battery) {
-    if (batteryCount > 1) return
-    batteryCount++
+    // if (batteryCount > 1) return
+    // batteryCount++
     console.log(battery, '电量')
     const { XDeviceCode } = store.state
     store.commit('setBattery', battery)
