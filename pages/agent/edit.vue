@@ -19,23 +19,13 @@
           </pick-regions>
         </view>
       </view>
-      <view class="tab-box">
-        <view v-for="(item,index) in tabsList" :key="index" @click="toggleTabs(index)" class="item-tab" :class="{tabActive:index === activeIndex}">{{item}}</view>
-      </view>
       <view class="price_box">
-        <view class="box_title" v-if="activeIndex === 0">
+        <view class="box_title">
           <view class="p_title">价格填写</view>
           <view class="add_btn" @click="onAddPrice">添加价格+</view>
         </view>
-        <view class="box_title" v-else>
-          <view class="p_title">明细填写</view>
-          <view class="add_btn" @click="onAddPrice">添加明细+</view>
-        </view>
         <view class="price_edit">
           <view class="edit_item" v-for="(item, index) in price_info" :key="index">
-            <view class="product-img" v-if="activeIndex === 1">
-              <image @click="handleChangeImg(index)" class="img" :src="item.small_img" mode="widthFix"></image>
-            </view>
             <view class="item_info">
               <view class="label">售 价<text class="label_icon"></text></view>
               <input type="text" v-model="item.sale_price" />
@@ -62,10 +52,8 @@
     httpAgentUpdate,
     httpAgentInfo
   } from '@/utils/request/api/agent.js'
-  import { mapState, mapMutations } from 'vuex'
   export default {
     computed: {
-      ...mapState(['PickItemImg',  'PickItemId']),
       regionName() {
         // 转为字符串
         return this.region.join('')
@@ -73,10 +61,6 @@
     },
     data() {
       return {
-        dataList: {},
-        jumpIndex: 0,
-        tabsList: ['按照价格', '按照产品'],
-        activeIndex: 0,
         isShowRegion: false,
         region: [],
         agentInfo: {
@@ -87,8 +71,6 @@
           area: null //区
         },
         price_info: [{
-          goods_id: '',
-          small_img: '../../static/img/public/circle.png',
           sale_price: 0,
           share_price: 0
         }],
@@ -96,53 +78,8 @@
       }
     },
     methods: {
-      ...mapMutations(['setPickItemImg', 'setPickItemId']),
-      handleChangeImg(index) {
-        this.jumpIndex = index
-        uni.navigateTo({
-            url:'/pages/project/edit?addProxy=1'
-        });
-      },
-      toggleTabs(index){
-        console.log(index);
-        console.log(this.dataList.price_info);
-        if(this.id) {
-          if(index === 0) {
-            if(this.dataList.price_info && this.dataList.price_info.length > 0) {
-              let combinePriceInfo = this.dataList.price_info.map(item => {
-                item.goods_id = '';
-                item.small_img = '../../static/img/public/circle.png'
-                return item;
-              })
-              console.log(combinePriceInfo);
-              this.price_info = combinePriceInfo
-            }else {
-              this.price_info = [{
-                goods_id: '',
-                small_img: '../../static/img/public/circle.png',
-                sale_price: 0,
-                share_price: 0
-              }]
-            }
-        }else {
-          if(this.dataList.goods_info && this.dataList.goods_info.length > 0) {
-            this.price_info = this.dataList.goods_info
-          }else {
-            this.price_info = [{
-              goods_id: '',
-              small_img: '../../static/img/public/circle.png',
-              sale_price: 0,
-              share_price: 0
-            }]
-          }
-        }
-        }
-        this.activeIndex = index;
-      },
       onAddPrice() {
         const obj = {
-          goods_id: '',
-          small_img: '../../static/img/public/circle.png',
           sale_price: 0,
           share_price: 0
         }
@@ -226,21 +163,9 @@
         const {
           msg
         } = await httpAgentInfo(params)
-        this.dataList = msg
         this.agentInfo = msg.channel_info
         this.region = [this.agentInfo.province, this.agentInfo.city, this.agentInfo.area]
-        if(msg.goods_info && msg.goods_info.length > 0) {
-          this.price_info = msg.goods_info
-          this.activeIndex = 1
-        }else {
-          let combinePriceInfo = msg.price_info.map(item => {
-            item.goods_id = '';
-            item.small_img = '../../static/img/public/circle.png'
-            return item;
-          })
-          this.price_info = combinePriceInfo
-          this.activeIndex = 0
-        }
+        this.price_info = msg.price_info
       },
       toSubmit() {
         const {
@@ -258,37 +183,18 @@
         const regRes = this.handleFormCheck(params)
         if (!regRes) return
         // 校验金额
-        let filterPriceInfo = this.price_info.map(item => {
-          if(this.activeIndex === 0) {
-            return {
-              "sale_price": item.sale_price ? item.sale_price : 0,
-              "share_price": item.share_price ? item.share_price : 0,
-            }
-          }else {
-            return {
-              "goods_id": item.goods_id,
-              "sale_price": item.sale_price ? item.sale_price : 0,
-              "share_price": item.share_price ? item.share_price : 0,
-            }
-          }
-        })
-        /* for(let i = 0; i < this.price_info.length; i++) {
+        for(let i = 0; i < this.price_info.length; i++) {
           const item = this.price_info[i]
-          if(this.activeIndex === 0) {
-            delete item.goods_id;
-            delete item.small_img;
-          }
           if(!item.sale_price) item.sale_price = 0
           if(!item.share_price) item.share_price = 0
-        } */
-        params.price_info = JSON.stringify(filterPriceInfo)
-        console.log("已提交信息")
-        console.log(params)
+        }
+        params.price_info = JSON.stringify(this.price_info)
         if (this.id) {
           this.handleEdit(params)
         } else {
           this.handleAdd(params)
         }
+        // console.log("已提交信息")
       },
       handleEdit(params) {
         params.channel_id = this.id
@@ -323,17 +229,6 @@
       if (id) {
         this.getAgentInfo()
       }
-    },
-    onShow(){
-      console.log('onshow')
-      console.log(this.PickItemImg)
-      this.PickItemImg && (this.price_info[this.jumpIndex].small_img = this.PickItemImg)
-      this.PickItemId && (this.price_info[this.jumpIndex].goods_id = this.PickItemId)
-    },
-    onUnload(){
-      console.log('onUnload监听页面卸载');
-      this.setPickItemImg('')
-      this.setPickItemId('')
     }
   }
 </script>
@@ -397,30 +292,6 @@
         }
       }
 
-      .tab-box {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 24px 0;
-        .item-tab {
-          font-size: 24rpx;
-          padding: 10rpx 20rpx;
-          color: #fff;
-          background-color: #ccc;
-        }
-        .tabActive {
-          background-color: #EF730F;
-        }
-        .item-tab:first-child {
-          border-top-left-radius: 6rpx;
-          border-bottom-left-radius: 6rpx;
-        }
-        .item-tab:last-child {
-          border-top-right-radius: 6rpx;
-          border-bottom-right-radius: 6rpx;
-        }
-      }
-
       .price_box {
         margin-top: 50rpx;
 
@@ -446,23 +317,15 @@
 
             display: flex;
             align-items: center;
-            // padding: 0 24rpx;
+            padding: 0 24rpx;
             border-bottom: 1rpx solid #b5b5b5;
-            .product-img {
-              width: 80rpx;
-              height: 80rpx;
-              .img {
-                width: 80rpx;
-                height: 80rpx;
-              }
-            }
 
             .item_info {
               display: flex;
-              margin: 0 15rpx;
+              margin-right: 30rpx;
 
               input {
-                width: 100rpx;
+                width: 120rpx;
               }
             }
 

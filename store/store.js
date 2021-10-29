@@ -27,15 +27,99 @@ const store = new Vuex.Store({
     XBattery: uni.getStorageSync('BATTERY'),
     XHexData: uni.getStorageSync('HEXDATA'),
     XCntStatus: uni.getStorageSync('CNTSTATUS'),
-    PickItemImg: '',
-    PickItemId: '',
+    connectedDeviceId: uni.getStorageSync('connectingDeviceId'),
+    services_UUID: uni.getStorageSync('services_UUID'),
+    characteristic_UUID: uni.getStorageSync('characteristic_UUID'),
+    discovering: uni.getStorageSync('discovering'),
+    deviceList: [],
+    available: uni.getStorageSync('available'),
+    connected: false,
+    deviceName: '',
+    status: '',
+    data: {},
+    services: [],
+    serviceId: '',
+    writeServicweId: "",         // 可写服务uuid  
+    writeCharacteristicsId: "",  // 可写特征值uuid  
+    readServicweId: "",          // 可读服务uuid  
+    readCharacteristicsId: "",   // 可读特征值uuid  
+    configServicweId: "",       
+     // 空中配置服务uuid  
+    configCharacteristicsId: "", // 空中配置特征值uuid
+    devicesList: []
   },
   mutations: {
-    setPickItemImg (state, provider) {
-      state.PickItemImg = provider
+    setwriteServicweId(state, provider) {
+      state.writeServicweId = provider
+      uni.setStorageSync('writeServicweId', provider)
     },
-    setPickItemId (state, provider) {
-      state.PickItemId = provider
+    setwriteCharacteristicsId(state, provider) {
+      state.writeCharacteristicsId = provider
+      uni.setStorageSync('writeCharacteristicsId', provider)
+    },
+    setreadServicweId(state, provider) {
+      state.readServicweId = provider
+      uni.setStorageSync('readServicweId', provider)
+    },
+    setreadCharacteristicsId(state, provider) {
+      state.readCharacteristicsId = provider
+      uni.setStorageSync('readCharacteristicsId', provider)
+    },
+    setconfigServicweId(state, provider) {
+      state.configServicweId = provider
+      uni.setStorageSync('configServicweId', provider)
+    },
+    setconfigCharacteristicsId(state, provider) {
+      state.configCharacteristicsId = provider
+      uni.setStorageSync('configCharacteristicsId', provider)
+    },
+    setServiceId(state, provider) {
+      state.serviceId = provider
+      uni.setStorageSync('serviceId', provider)
+    },
+    setServices(state, provider) {
+      state.services = provider
+      uni.setStorageSync('services', provider)
+    },
+    setData (state, provider) {
+      state.data = provider
+      uni.setStorageSync('data', provider)
+    },
+    setStatus (state, provider) {
+      state.status = provider
+      uni.setStorageSync('status', provider)
+    },
+    setDeviceName (state, provider) {
+      state.deviceName = provider
+      uni.setStorageSync('deviceName', provider)
+    },
+    setConnected (state, provider) {
+      state.connected = provider
+      uni.setStorageSync('connected', provider)
+    },
+    setAvailable (state, provider) {
+      state.available = provider
+      uni.setStorageSync('available', provider)
+    },
+    setDeviceList (state, provider) {
+      state.deviceList = provider
+      uni.setStorageSync('deviceList', provider)
+    },
+    setDiscovering (state, provider) {
+      state.discovering = provider
+      uni.setStorageSync('discovering', provider)
+    },
+    setConnectedDeviceId (state, provider) {
+      state.connectedDeviceId = provider
+      uni.setStorageSync('connectedDeviceId', provider)
+    },
+    setServicesUUID (state, provider) {
+      state.services_UUID = provider
+      uni.setStorageSync('services_UUID', provider)
+    },
+    setCharacteristicUUID (state, provider) {
+      state.characteristic_UUID = provider
+      uni.setStorageSync('characteristic_UUID', provider)
     },
     setOpenId (state, provider) {
       state.XOpenId = provider

@@ -1,209 +1,209 @@
 {
   "pages": [
-		{
-			"path": "pages/login/login",
-			"style": {
-				"navigationBarTitleText": "登录",
-				"navigationStyle": "custom"
-			}
-		},
-		{
-			"path": "pages/index/index",
-			"style": {
-				"navigationBarTitleText": "首页",
-				"navigationBarTextStyle": "black",
-				"navigationBarBackgroundColor": "#f8f8f8"
-			}
-		},
-		{
-			"path": "pages/user/user",
-			"style": {
-				"navigationBarTitleText": "我的",
-				"navigationStyle": "custom"
-			}
-		},
-		{
-			"path": "pages/statistics/statistics",
-			"style": {
-				"navigationBarTitleText": "销售统计"
-			}
-		},
-		{
-			"path": "pages/position/position",
-			"style": {
-				"navigationBarTitleText": "点位管理"
-			}
-		},
-		{
-			"path": "pages/position/positionMenu",
-			"style": {
-				"navigationBarTitleText": "点位详情"
-			}
-		},
-		{
-			"path": "pages/position/positionEdit",
-			"style": {
-				"navigationBarTitleText": "编辑点位"
-			}
-		},
-		{
-			"path": "pages/position/statistics",
-			"style": {
-				"navigationBarTitleText": "数据统计"
-			}
-		},
-		{
-			"path": "pages/position/record",
-			"style": {
-				"navigationBarTitleText": "库存记录"
-			}
-		},
-		{
-			"path": "pages/position/detail",
-			"style": {
-				"navigationBarTitleText": "库存详情"
-			}
-		},
-		{
-			"path": "pages/position/putsetting",
-			"style": {
-				"navigationBarTitleText": "出/入库"
-			}
-		},
-		{
-			"path": "pages/device/device",
-			"style": {
-				"navigationBarTitleText": "设备管理"
-			}
-		},
-		{
-			"path": "pages/device/machineList",
-			"style": {
-				"navigationBarTitleText": "设备列表"
-			}
-		},
-		{
-			"path": "pages/device/deviceAdd",
-			"style": {
-				"navigationBarTitleText": "设备入驻"
-			}
-		},
-		{
-			"path": "pages/agent/agent",
-			"style": {
-				"navigationBarTitleText": "代理管理"
-			}
-		},
-		{
-			"path": "pages/agent/edit",
-			"style": {
-				"navigationBarTitleText": "添加代理"
-			}
-		},
-		{
-			"path": "pages/project/project",
-			"style": {
-				"navigationBarTitleText": "方案管理"
-			}
-		},
-		{
-			"path": "pages/project/edit",
-			"style": {
-				"navigationBarTitleText": "方案编辑"
-			}
-		},
-		{
-			"path": "pages/order/order",
-			"style": {
-				"navigationBarTitleText": "订单管理"
-			}
-		},
-		{
-			"path": "pages/stock/stock",
-			"style": {
-				"navigationBarTitleText": "库存管理"
-			}
-		},
-		{
-			"path": "pages/stock/record",
-			"style": {
-				"navigationBarTitleText": "记录"
-			}
-		},
-		{
-			"path": "pages/stock/detail",
-			"style": {
-				"navigationBarTitleText": "库存详情"
-			}
-		},
-		{
-			"path": "pages/stock/goods",
-			"style": {
-				"navigationBarTitleText": "库存商品"
-			}
-		},
-		{
-			"path": "pages/stock/menu",
-			"style": {
-				"navigationBarTitleText": "库存管理"
-			}
-		},
-		{
-			"path": "pages/stock/putsetting",
-			"style": {
-				"navigationBarTitleText": "出/入库"
-			}
-		},
-		{
-			"path": "pages/user/money",
-			"style": {
-				"navigationBarTitleText": "提现"
-			}
-		},
-		{
-			"path": "pages/user/moneySuccess",
-			"style": {
-				"navigationBarTitleText": "提现成功"
-			}
-		},
-		{
-			"path": "pages/user/bill",
-			"style": {
-				"navigationBarTitleText": "账单明细"
-			}
-		},
-		{
-			"path": "pages/user/account",
-			"style": {
-				"navigationBarTitleText": "账户绑定"
-			}
-		},
-		{
-			"path": "pages/user/role",
-			"style": {
-				"navigationBarTitleText": "角色管理"
-			}
-		},
-		{
-			"path": "pages/user/roleList",
-			"style": {
-				"navigationBarTitleText": "角色列表"
-			}
-		},
-		{
-			"path": "pages/user/roleEdit",
-			"style": {
-				"navigationBarTitleText": "绑定点位"
-			}
-		},
-		{
-			"path": "pages/user/resetPwd",
-			"style": {
-				"navigationBarTitleText": "修改密码"
-			}
-		}
-	],
-	"subPackages": [
+    {
+      "path": "pages/login/login",
+      "style": {
+        "navigationBarTitleText": "登录",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "首页",
+        "navigationBarTextStyle": "black",
+        "navigationBarBackgroundColor": "#f8f8f8"
+      }
+    },
+    {
+      "path": "pages/user/user",
+      "style": {
+        "navigationBarTitleText": "我的",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/statistics/statistics",
+      "style": {
+        "navigationBarTitleText": "销售统计"
+      }
+    },
+    {
+      "path": "pages/position/position",
+      "style": {
+        "navigationBarTitleText": "点位管理"
+      }
+    },
+    {
+      "path": "pages/position/positionMenu",
+      "style": {
+        "navigationBarTitleText": "点位详情"
+      }
+    },
+    {
+      "path": "pages/position/positionEdit",
+      "style": {
+        "navigationBarTitleText": "编辑点位"
+      }
+    },
+    {
+      "path": "pages/position/statistics",
+      "style": {
+        "navigationBarTitleText": "数据统计"
+      }
+    },
+    {
+      "path": "pages/position/record",
+      "style": {
+        "navigationBarTitleText": "库存记录"
+      }
+    },
+    {
+      "path": "pages/position/detail",
+      "style": {
+        "navigationBarTitleText": "库存详情"
+      }
+    },
+    {
+      "path": "pages/position/putsetting",
+      "style": {
+        "navigationBarTitleText": "出/入库"
+      }
+    },
+    {
+      "path": "pages/device/device",
+      "style": {
+        "navigationBarTitleText": "设备管理"
+      }
+    },
+    {
+      "path": "pages/device/machineList",
+      "style": {
+        "navigationBarTitleText": "设备列表"
+      }
+    },
+    {
+      "path": "pages/device/deviceAdd",
+      "style": {
+        "navigationBarTitleText": "设备入驻"
+      }
+    },
+    {
+      "path": "pages/agent/agent",
+      "style": {
+        "navigationBarTitleText": "代理管理"
+      }
+    },
+    {
+      "path": "pages/agent/edit",
+      "style": {
+        "navigationBarTitleText": "添加代理"
+      }
+    },
+    {
+      "path": "pages/project/project",
+      "style": {
+        "navigationBarTitleText": "方案管理"
+      }
+    },
+    {
+      "path": "pages/project/edit",
+      "style": {
+        "navigationBarTitleText": "方案编辑"
+      }
+    },
+    {
+      "path": "pages/order/order",
+      "style": {
+        "navigationBarTitleText": "订单管理"
+      }
+    },
+    {
+      "path": "pages/stock/stock",
+      "style": {
+        "navigationBarTitleText": "库存管理"
+      }
+    },
+    {
+      "path": "pages/stock/record",
+      "style": {
+        "navigationBarTitleText": "记录"
+      }
+    },
+    {
+      "path": "pages/stock/detail",
+      "style": {
+        "navigationBarTitleText": "库存详情"
+      }
+    },
+    {
+      "path": "pages/stock/goods",
+      "style": {
+        "navigationBarTitleText": "库存商品"
+      }
+    },
+    {
+      "path": "pages/stock/menu",
+      "style": {
+        "navigationBarTitleText": "库存管理"
+      }
+    },
+    {
+      "path": "pages/stock/putsetting",
+      "style": {
+        "navigationBarTitleText": "出/入库"
+      }
+    },
+    {
+      "path": "pages/user/money",
+      "style": {
+        "navigationBarTitleText": "提现"
+      }
+    },
+    {
+      "path": "pages/user/moneySuccess",
+      "style": {
+        "navigationBarTitleText": "提现成功"
+      }
+    },
+    {
+      "path": "pages/user/bill",
+      "style": {
+        "navigationBarTitleText": "账单明细"
+      }
+    },
+    {
+      "path": "pages/user/account",
+      "style": {
+        "navigationBarTitleText": "账户绑定"
+      }
+    },
+    {
+      "path": "pages/user/role",
+      "style": {
+        "navigationBarTitleText": "角色管理"
+      }
+    },
+    {
+      "path": "pages/user/roleList",
+      "style": {
+        "navigationBarTitleText": "角色列表"
+      }
+    },
+    {
+      "path": "pages/user/roleEdit",
+      "style": {
+        "navigationBarTitleText": "绑定点位"
+      }
+    },
+    {
+      "path": "pages/user/resetPwd",
+      "style": {
+        "navigationBarTitleText": "修改密码"
+      }
+    }
+  ],
+  "subPackages": [
 		{
 			"root": "pages/report",
 			"pages": [
@@ -213,89 +213,89 @@
 				{
 					"path": "detail",
 					"style": {
-						"navigationBarBackgroundColor": "#de763f"
+					  "navigationBarBackgroundColor": "#de763f"
 					}
 				}
 			]
 		},
-		{
-			"root": "operation",
-			"pages": [
-				{
-					"path": "operation",
-					"style": {
-						"navigationBarTitleText": "运维管理"
-					}
-				},
-				{
-					"path": "lamplight",
-					"style": {
-						"navigationBarTitleText": "灯光设置"
-					}
-				},
-				{
-					"path": "deviceTest",
-					"style": {
-						"navigationBarTitleText": "设备测试"
-					}
-				},
-				{
-					"path": "deviceUnbind",
-					"style": {
-						"navigationBarTitleText": "设备解绑"
-					}
-				},
-				{
-					"path": "supplyAdd",
-					"style": {
-						"navigationBarTitleText": "补货"
-					}
-				},
-				{
-					"path": "supplyAddDetail",
-					"style": {
-						"navigationBarTitleText": "补货详情"
-					}
-				},
-				{
-					"path": "supplyAddOp",
-					"style": {
-						"navigationBarTitleText": "补货操作"
-					}
-				},
-				{
-					"path": "power",
-					"style": {
-						"navigationBarTitleText": "电量预警"
-					}
-				},
-				{
-					"path": "unScan",
-					"style": {
-						"navigationBarTitleText": "未扫码预警"
-					}
-				},
-				{
-					"path": "supplyShort",
-					"style": {
-						"navigationBarTitleText": "缺货统计"
-					}
-				},
-				{
-					"path": "supplyShortStatistic",
-					"style": {
-						"navigationBarTitleText": "总计"
-					}
-				},
-				{
-					"path": "supplyShortMachine",
-					"style": {
-						"navigationBarTitleText": "缺货机器"
-					}
-				}
-			]
-		}
-	],
+    {
+      "root": "operation",
+      "pages": [
+        {
+          "path": "operation",
+          "style": {
+            "navigationBarTitleText": "运维管理"
+          }
+        },
+        {
+          "path": "lamplight",
+          "style": {
+            "navigationBarTitleText": "灯光设置"
+          }
+        },
+        {
+          "path": "deviceTest",
+          "style": {
+            "navigationBarTitleText": "设备测试"
+          }
+        },
+        {
+          "path": "deviceUnbind",
+          "style": {
+            "navigationBarTitleText": "设备解绑"
+          }
+        },
+        {
+          "path": "supplyAdd",
+          "style": {
+            "navigationBarTitleText": "补货"
+          }
+        },
+        {
+          "path": "supplyAddDetail",
+          "style": {
+            "navigationBarTitleText": "补货详情"
+          }
+        },
+        {
+          "path": "supplyAddOp",
+          "style": {
+            "navigationBarTitleText": "补货操作"
+          }
+        },
+        {
+          "path": "power",
+          "style": {
+            "navigationBarTitleText": "电量预警"
+          }
+        },
+        {
+          "path": "unScan",
+          "style": {
+            "navigationBarTitleText": "未扫码预警"
+          }
+        },
+        {
+          "path": "supplyShort",
+          "style": {
+            "navigationBarTitleText": "缺货统计"
+          }
+        },
+        {
+          "path": "supplyShortStatistic",
+          "style": {
+            "navigationBarTitleText": "总计"
+          }
+        },
+        {
+          "path": "supplyShortMachine",
+          "style": {
+            "navigationBarTitleText": "缺货机器"
+          }
+        }
+      ]
+    }
+  ],
   "preloadRule": {
     "operation/operation": {
       "network": "all",

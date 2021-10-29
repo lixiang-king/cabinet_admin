@@ -1,6 +1,6 @@
 <template>
   <view>
-    <view class="project_page" v-show="!isGoodsShow">
+    <view class="project_page" v-if="!isGoodsShow">
       <SearchHeader v-if="!id" placeholder="机器名称" @regionOk="onSelectRegion" @search="onSearch"></SearchHeader>
       <view class="project_info">
         <view class="info_item">
@@ -13,14 +13,14 @@
           <input v-if="id" class="info_inp" type="text" v-model="submitInfo.programme_name" placeholder="请填写方案名称" />
           <input v-else class="info_inp" type="text" v-model="submitInfo.programme" placeholder="请填写方案名称" />
         </view>
-        <!-- <view class="info_item">
+        <view class="info_item">
           <view class="p_title">营销佣金</view>
           <input class="info_inp" type="text" v-model="submitInfo.marketing_money" placeholder="请填写营销佣金" />
         </view>
         <view class="info_item">
           <view class="p_title">介绍人分成</view>
           <input class="info_inp" type="text" v-model="submitInfo.introducer_money" placeholder="请填写介绍人分成金额" />
-        </view> -->
+        </view>
         <!-- <view class="tips">
           *营销佣金要在营销活动里开启当前点位活动才有效
         </view> -->
@@ -33,26 +33,18 @@
             <text>{{ item.hid }}</text>
           </div>
           <view class="item_info">
-            <!-- <view class="info_item" @click="toGoods(index)">
+            <view class="info_item" @click="toGoods(index)">
               <view class="info_label">选择商品</view>
               <view :class="['info_inp', item.goods_name ? '' : 'place_holder']">{{ item.goods_name ? item.goods_name : '点击选择商品' }}</view>
-            </view> -->
+            </view>
             <view class="info_item">
               <view class="info_label">商品售价</view>
-              <input v-if="id" class="info_inp" type="text" :value="item.price" placeholder="请填写商品价格" @input="onGoodsPriceInp($event, item, index)" />
-              <input v-else class="info_inp" type="text" :value="item.price" placeholder="请填写商品价格" @input="onGoodsPriceInp($event, item, index)" />
+              <input v-if="id" class="info_inp" type="text" :value="item.price" placeholder="请填写商品价格" @input="onGoodsPriceInp($event, item)" />
+              <input v-else class="info_inp" type="text" :value="item.price" placeholder="请填写商品价格" @input="onGoodsPriceInp($event, item)" />
             </view>
             <view class="info_item">
               <view class="info_label">点位分成</view>
-              <input class="info_inp" type="text" :value="item.place_money" placeholder="请填写点位分成金额" @input="onPlaceMoneyInp($event, item, index)" />
-            </view>
-            <view class="info_item">
-              <view class="info_label">营销佣金</view>
-              <input class="info_inp" type="text" :value="item.marketing_money" placeholder="请填写营销佣金" @input="onPlaceYinInp($event, item, index)" />
-            </view>
-            <view class="info_item">
-              <view class="info_label">介绍人分成</view>
-              <input class="info_inp" type="text" :value="item.introducer_money" placeholder="请填写介绍人分成金额" @input="onPlaceJieInp($event, item, index)" />
+              <input class="info_inp" type="text" :value="item.place_money" placeholder="请填写点位分成金额" @input="onPlaceMoneyInp($event, item)" />
             </view>
           </view>
         </view>
@@ -61,7 +53,7 @@
         提交
       </view>
     </view>
-    <Goods v-show="isGoodsShow" :dataList="dataList" @ok="onGoodsOk"></Goods>
+    <Goods v-if="isGoodsShow" :dataList="dataList" @ok="onGoodsOk"></Goods>
   </view>
 
 </template>
@@ -76,7 +68,6 @@
     httpProInfoById
   } from '@/utils/request/api/programme.js'
   import Goods from './Goods'
-  import { mapState, mapMutations } from 'vuex'
   export default {
     components: {
       Goods
@@ -85,7 +76,6 @@
       return {
         id: '',
         place_id: '',
-        addProxy: '',
         isGoodsShow: false,
         dataList: [],
         searchName: '',
@@ -102,32 +92,13 @@
       }
     },
     methods: {
-      ...mapMutations(['setPickItemImg', 'setPickItemId']),
-      handleCommonFirst(val, item, index, key) {
-        if(index === 0) {
-          this.goods_info = this.goods_info.map(item => {
-            item[key] = val
-            return item
-          })
-        }else {
-          item[key] = val
-        }
-      },
-      onPlaceYinInp(e, item, index) {
+      onGoodsPriceInp(e, item) {
         const val = e.target.value
-        this.handleCommonFirst(val, item, index, 'marketing_money')
+        item.price = val
       },
-      onPlaceJieInp(e, item, index) {
+      onPlaceMoneyInp(e, item) {
         const val = e.target.value
-        this.handleCommonFirst(val, item, index, 'introducer_money')
-      },
-      onGoodsPriceInp(e, item, index) {
-        const val = e.target.value
-        this.handleCommonFirst(val, item, index, 'price')
-      },
-      onPlaceMoneyInp(e, item, index) {
-        const val = e.target.value
-        this.handleCommonFirst(val, item, index, 'place_money')
+        item.place_money = val
       },
       onPickOk(obj) {
         this.submitInfo.place_id = obj.place_id
@@ -151,14 +122,6 @@
         // })
       },
       onGoodsOk(item) {
-        if(this.addProxy) {
-          this.setPickItemImg(item.small_img)
-          this.setPickItemId(item.goods_id)
-          uni.navigateBack({
-            delta: 1
-          })
-          return;
-        }
         uni.setNavigationBarTitle({
           title: '方案添加'
         })
@@ -166,11 +129,7 @@
         this.goods_info[this.goodsIndex].goods_name = item.goods_name
         this.goods_info[this.goodsIndex].goods_id = item.goods_id
         this.goods_info[this.goodsIndex].small_img = item.small_img
-        this.goods_info = this.goods_info.map(listItem => {
-          listItem.price = item.goods_price || 0
-          return listItem
-        })
-        console.log(this.goods_info);
+        this.goods_info[this.goodsIndex].price = item.goods_price
       },
       // 新增时获取方案信息
       async getProAddInfo() {
@@ -249,7 +208,7 @@
             icon: 'none'
           })
         }
-        /* if (!params.marketing_money) {
+        if (!params.marketing_money) {
           return uni.showToast({
             title: '请输入营销佣金',
             icon: 'none'
@@ -260,7 +219,7 @@
             title: '请输入介绍人佣金',
             icon: 'none'
           })
-        } */
+        }
         params.hd_info = JSON.stringify(this.goods_info)
         if (this.id) {
           params.programme_id = this.id
@@ -274,7 +233,6 @@
               icon: 'none'
             })
           }
-          console.log(params);
           this.handleAdd(params)
         }
       }
@@ -282,18 +240,6 @@
     onLoad(option) {
       this.id = option.id
       this.place_id = option.placeId
-      this.addProxy = option.addProxy
-      if(this.addProxy) {
-        this.setPickItemImg('')
-        this.setPickItemId('')
-        this.getDataList()
-        this.isGoodsShow = true
-        // this.goodsIndex = index
-        uni.setNavigationBarTitle({
-          title: '选择商品'
-        })
-        return;
-      }
       if (this.id) { // 编辑
         uni.setNavigationBarTitle({
           title: '方案编辑'

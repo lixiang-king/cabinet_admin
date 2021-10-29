@@ -29,18 +29,76 @@
         </view>
         <view class="test_info">
           <view class="test_number" v-for="item in 9" :key="item" @click="onSetNumber(item)">{{ item + 1}}</view>
+		  <!-- <view class="test_number"  @click="onSetNumber(0)">1</view>
+		  <view class="test_number"  @click="onSetNumber(1)">2</view>
+		  <view class="test_number"  @click="onSetNumber(2)">3</view>
+		  <view class="test_number"  @click="onSetNumber(3)">4</view>
+		  <view class="test_number"  @click="onSetNumber(4)">5</view>
+		  <view class="test_number"  @click="onSetNumber(5)">6</view>
+		  <view class="test_number"  @click="onSetNumber(6)">7</view>
+		  <view class="test_number"  @click="onSetNumber(7)">8</view>
+		  <view class="test_number"  @click="onSetNumber(8)">9</view> -->
         </view>
         <view class="light_btn">
-          <view class="open_light" @click="openLight">
+          <view class="open_light" @click="switchLight(1)">
             <image :src="require('./static/open_light.png')" mode="widthFix"></image>
             <text>开灯</text>
           </view>
 
-          <view class="close_light" @click="closeLight">
+          <view class="close_light" @click="switchLight(0)">
             <image :src="require('./static/close_light.png')" mode="widthFix"></image>
             <text>关灯</text>
           </view>
         </view>
+		
+		<view class="light_btn">
+		  <view class="open_light" @click="switchRunLight">
+		    <image :src="require('./static/open_light.png')" mode="widthFix"></image>
+		    <text>跑马灯开灯</text>
+		  </view>
+		
+		  <view class="close_light" @click="switchRunLight">
+		    <image :src="require('./static/close_light.png')" mode="widthFix"></image>
+		    <text>跑马灯关灯</text>
+		  </view>
+		</view>
+		
+		<view class="light_btn">
+		  <view class="open_light" @click="switchModal(5)">
+		    <image :src="require('./static/open_light.png')" mode="widthFix"></image>
+		    <text>模式+</text>
+		  </view>
+		
+		  <view class="close_light" @click="switchModal(23)">
+		    <image :src="require('./static/close_light.png')" mode="widthFix"></image>
+		    <text>模式-</text>
+		  </view>
+		</view>
+		
+		<view class="light_btn">
+		  <view class="open_light" @click="switchModal(3)">
+		    <image :src="require('./static/open_light.png')" mode="widthFix"></image>
+		    <text>速度+</text>
+		  </view>
+		
+		  <view class="close_light" @click="switchModal(9)">
+		    <image :src="require('./static/close_light.png')" mode="widthFix"></image>
+		    <text>速度-</text>
+		  </view>
+		</view>
+		
+		<view class="light_btn">
+		  <view class="open_light" @click="switchModal(42)">
+		    <image :src="require('./static/open_light.png')" mode="widthFix"></image>
+		    <text>亮度+</text>
+		  </view>
+		
+		  <view class="close_light" @click="switchModal(40)">
+		    <image :src="require('./static/close_light.png')" mode="widthFix"></image>
+		    <text>亮度-</text>
+		  </view>
+		</view>
+		
         <view class="battery_btn">电量: {{ XBattery ? XBattery : 0 }}</view>
       </view>
     </view>
@@ -65,23 +123,36 @@
       BLEC.closeBle()
     },
     onLoad() {
-      BLEC.openBluetoothAdapter()
+      // BLEC.openBluetoothAdapter()
     },
     methods: {
-      ...mapMutations(['setDeviceCode']),
+      ...mapMutations(['setDeviceCode', 'setDeviceName']),
       scanToShow() {
+        /* BLEC.searchEvent();
         uni.scanCode({
           success: res => {
             const { result } = res
             const arr = result.split('/')
             this.setDeviceCode(arr[arr.length - 1])
-            // https://me.dc-box.com/scode/A20081001022
-            BLEC.found()
+            BLEC.connectEvent()
+          }
+        }) */
+        var that = this
+        wx.scanCode({
+          success: res =>  {
+            const { result } = res
+            console.log("扫码======》");
+            console.log(res);
+            const arr = result.split('/')
+            this.setDeviceCode(arr[arr.length - 1])
+            that.setDeviceName(arr[arr.length - 1])
+            BLEC.startBluetooth();
           }
         })
       },
       onSetNumber(index) {
-        const params = {
+        BLEC.navTo1(index)
+        /* const params = {
           machine_id: this.XDeviceCode,
           hid: index + 1
         }
@@ -89,7 +160,7 @@
           if (res.code === 1) {
             const hex = this.XHexData.changeHex[index]
             BLEC.write(hex).then(res => {
-              console.log(92)
+              
             })
           } else {
             uni.showToast({
@@ -103,14 +174,20 @@
             title: '获取权限失败',
             icon: 'none'
           })
-        })
+        }) */
       },
-      openLight() {
-        BLEC.write(this.XHexData.toggleLight.open)
+      //中间灯开关
+      switchLight(type) {
+        BLEC.navTo(type)
       },
-      closeLight() {
-        BLEC.write(this.XHexData.toggleLight.close)
-      }
+      //跑马灯开关
+      switchRunLight() {
+        BLEC.navTo2(170)
+      },
+      // 切换模式&速度&亮度
+      switchModal(type) {
+        BLEC.navTo3(type)
+      },
     }
   }
 </script>
@@ -221,6 +298,7 @@
           display: flex;
           justify-content: center;
           color: #FFFFFF;
+          margin-bottom: 20rpx;
 
           .open_light,
           .close_light {
