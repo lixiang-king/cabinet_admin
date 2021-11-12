@@ -369,7 +369,9 @@ const BLEC = {
               console.log(bufToHexVal);
               console.log(bufToHexVal.slice(10,12));
               console.log("转换后的电量值是====》", parseInt(bufToHexVal.slice(10,12), 16));
-              that.handleBattery(parseInt(bufToHexVal.slice(10,12), 16))
+              if(bufToHexVal.length === 14) {
+                that.handleBattery(parseInt(bufToHexVal.slice(10,12), 16))
+              }
             }
           })
           //获取电量
