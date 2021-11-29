@@ -399,6 +399,9 @@ const BLEC = {
 
   /* 灯光设置：获取电量 */
   navToLight(index) {
+    let hh = new Date().getHours() < 10 ? '0' + new Date().getHours() : new Date().getHours()
+    let mf = new Date().getMinutes() < 10 ? '0' + new Date().getMinutes() : new Date().getMinutes()
+    let ss = new Date().getSeconds() < 10 ? '0' + new Date().getSeconds() : new Date().getSeconds()
     var that = this
     var order="9999999999999999999999";
     let buffer = new ArrayBuffer(16);
@@ -408,9 +411,9 @@ const BLEC = {
     dataView.setUint8(2, parseInt(2,10));//led设置：2
     dataView.setUint8(3, parseInt(1,10));//1 中间灯 ；2 仓位环灯；3 外圈跑马灯
     dataView.setUint8(4, parseInt(index,10));//LED 子命令：0 关 ；1 开 ；外圈跑马灯灯带控制指令
-    dataView.setUint8(5, parseInt(0,16)); // 校验时间： 时
-    dataView.setUint8(6, parseInt(0,16)); // 校验时间： 分
-    dataView.setUint8(7, parseInt(0,16)); // 校验时间： 秒
+    dataView.setUint8(5, parseInt(hh,16)); // 校验时间： 时
+    dataView.setUint8(6, parseInt(mf,16)); // 校验时间： 分
+    dataView.setUint8(7, parseInt(ss,16)); // 校验时间： 秒
     dataView.setUint8(8, parseInt(0,16));//开始时间：时
     dataView.setUint8(9, parseInt(0,16));//开始时间：分
     dataView.setUint8(10, parseInt(0,16));//开始时间：秒 17为11
