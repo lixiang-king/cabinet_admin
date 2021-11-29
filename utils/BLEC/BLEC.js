@@ -411,9 +411,9 @@ const BLEC = {
     dataView.setUint8(2, parseInt(2,10));//led设置：2
     dataView.setUint8(3, parseInt(1,10));//1 中间灯 ；2 仓位环灯；3 外圈跑马灯
     dataView.setUint8(4, parseInt(index,10));//LED 子命令：0 关 ；1 开 ；外圈跑马灯灯带控制指令
-    dataView.setUint8(5, parseInt(hh,16)); // 校验时间： 时
-    dataView.setUint8(6, parseInt(mf,16)); // 校验时间： 分
-    dataView.setUint8(7, parseInt(ss,16)); // 校验时间： 秒
+    dataView.setUint8(5, parseInt(hh,10)); // 校验时间： 时
+    dataView.setUint8(6, parseInt(mf,10)); // 校验时间： 分
+    dataView.setUint8(7, parseInt(ss,10)); // 校验时间： 秒
     dataView.setUint8(8, parseInt(0,16));//开始时间：时
     dataView.setUint8(9, parseInt(0,16));//开始时间：分
     dataView.setUint8(10, parseInt(0,16));//开始时间：秒 17为11
